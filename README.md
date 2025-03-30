@@ -1,6 +1,5 @@
 # host-a-dynamic-website-using-cloudformation
-repository for cloudformation files
-Dynamic Website Hosting with AWS CloudFormation
+
 This project demonstrates how to use AWS CloudFormation to host a dynamic website on AWS. It provisions the necessary resources such as VPC, Auto Scaling Group (ASG), Application Load Balancer (ALB), RDS, NAT Gateway, Route 53, and security groups to ensure that the infrastructure is both secure and scalable.
 
 Overview
