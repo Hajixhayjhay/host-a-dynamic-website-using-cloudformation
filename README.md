@@ -1,121 +1,128 @@
-# host-a-dynamic-website-using-cloudformation
+Project Overview
+This project demonstrates how to deploy a dynamic website using AWS CloudFormation. The project utilizes several CloudFormation YAML templates that automate the deployment of necessary AWS resources. These resources include a Virtual Private Cloud (VPC), NAT Gateway, RDS instance restored from a snapshot, Application Load Balancer (ALB), Auto Scaling Group (ASG), and Route 53 for DNS management.
 
-This project demonstrates how to use AWS CloudFormation to host a dynamic website on AWS. It provisions the necessary resources such as VPC, Auto Scaling Group (ASG), Application Load Balancer (ALB), RDS, NAT Gateway, Route 53, and security groups to ensure that the infrastructure is both secure and scalable.
+The primary goal is to set up a scalable, secure, and fully-functional environment that serves a dynamic website, complete with a database backend and automatic scaling of the application layer.
 
-Overview
-This setup uses multiple CloudFormation templates to deploy a fully functional dynamic website hosted on AWS. The resources provisioned include:
+Project Structure
+The project is organized into the following YAML templates:
 
-VPC with public and private subnets, security groups, and routing.
+vpc.yaml: Defines the VPC, subnets, and related networking resources.
 
-Auto Scaling Group (ASG) for EC2 instances to run the web application.
+nat-gateway.yaml: Configures the NAT Gateway to allow internet access for private subnets.
 
-Application Load Balancer (ALB) to distribute traffic between EC2 instances.
+rds-snapshot.yaml: Restores an RDS instance from a database snapshot.
 
-NAT Gateway to provide internet access to instances in private subnets.
+alb.yaml: Configures the Application Load Balancer (ALB), including listeners and target groups.
 
-RDS (Relational Database Service) instance for backend database support.
+asg.yaml: Creates an Auto Scaling Group (ASG) to automatically scale EC2 instances based on traffic.
 
-Route 53 for DNS management and domain routing.
-
-Security Groups configured for EC2, ALB, and RDS to ensure secure communication.
-
-Architecture
-VPC: A custom VPC is created with public and private subnets across multiple Availability Zones.
-
-Security Groups:
-
-Web Security Group: Allows HTTP (port 80) and HTTPS (port 443) traffic to EC2 instances.
-
-ALB Security Group: Configured to allow inbound HTTP/HTTPS traffic from the internet to the ALB.
-
-DB Security Group: Allows access from EC2 instances to the RDS instance, ensuring that only web servers can communicate with the database.
-
-Application Load Balancer: Distributes incoming HTTP/HTTPS traffic to the EC2 instances behind it.
-
-Auto Scaling Group: Ensures the right number of EC2 instances are running to handle traffic load, scaling up or down as needed.
-
-RDS: Configures a database instance to store dynamic content for the website.
-
-Route 53: Manages DNS settings to point the domain to the ALB.
+route-53.yaml: Configures Route 53 DNS settings for domain name resolution.
 
 Prerequisites
-Before you can deploy the CloudFormation stack, ensure the following:
 
-AWS Account: You need an active AWS account with the necessary permissions to create the required resources.
+AWS Account: A valid AWS account with sufficient privileges to create resources like EC2, RDS, S3, and CloudFormation.
 
-AWS CLI: Make sure the AWS CLI is installed and configured for your environment.
+CloudFormation YAML Files: The YAML files provided (e.g., vpc.yaml, nat-gateway.yaml, rds-snapshot.yaml, alb.yaml, asg.yaml, route-53.yaml).
 
-IAM Role/Permissions: The user deploying the stack should have permissions to create VPC, EC2, RDS, ALB, and other resources.
+Domain Name: A registered domain if you want to use Route 53 for DNS (optional).
 
-Deployment Steps
-Step 1: Upload CloudFormation Templates
-The following CloudFormation templates need to be uploaded and deployed in the specified order:
+Sublime Text: Used to edit and manage the CloudFormation YAML files.
 
-vpc.yaml: Provisions the VPC with subnets, security groups, and routing.
+How to Use
+Step 1: Prepare the CloudFormation Templates
+Ensure the CloudFormation templates (vpc.yaml, nat-gateway.yaml, rds-snapshot.yaml, alb.yaml, asg.yaml, route-53.yaml) are correctly set up with the necessary parameters such as instance sizes, VPC settings, and database credentials.
 
-nat-gateway.yaml: Configures a NAT Gateway to allow internet access for private instances.
+Step 2: Deploy the Stack Using the AWS Management Console
+Log in to the AWS Management Console: Navigate to the CloudFormation service.
 
-rds-snapshot.yaml: Deploys the RDS instance using a snapshot.
+Create a New Stack:
 
-alb.yaml: Configures the Application Load Balancer.
+Click on "Create stack" and choose "With new resources (standard)".
 
-asg.yaml: Creates the Auto Scaling Group with EC2 instances.
+Select "Upload a template file" and choose the appropriate YAML file for each resource (e.g., vpc.yaml, nat-gateway.yaml, etc.).
 
-route-53.yaml: Configures DNS routing to the ALB.
+Follow the prompts to configure stack parameters (e.g., stack name, VPC settings, database credentials, etc.).
 
-To deploy each template:
+Deploy Each Stack in Sequence:
 
-Navigate to AWS Management Console.
+Deploy the vpc.yaml first, followed by the nat-gateway.yaml, rds-snapshot.yaml, alb.yaml, asg.yaml, and route-53.yaml in the order they are listed.
 
-Open CloudFormation.
+Each stack will take several minutes to complete. You can monitor the stack creation process in the CloudFormation console.
 
-Click Create Stack and choose Upload a template file.
+Step 3: Access the Website
+Once the stack has been successfully created:
 
-Upload each YAML file in the specified order and follow the prompts to create each resource.
+Obtain the Public URL of the ALB: The Application Load Balancer (ALB) will provide a URL for accessing the dynamic website. You can find this URL in the AWS Management Console under the "EC2" service, in the "Load Balancers" section.
 
-Step 2: Verify Security Group Configuration
-The security groups are configured within the vpc.yaml file. After deployment, the following security groups are applied:
+Test the Website: Open the URL in your browser to view the dynamic website served through the EC2 instances behind the ALB.
 
-Web Security Group:
+Step 4: Monitor and Manage
+Scaling: The Auto Scaling Group (ASG) ensures that the appropriate number of EC2 instances are running based on traffic. Monitor and adjust the scaling settings as necessary in the AWS Management Console.
 
-Allows inbound HTTP (port 80) and HTTPS (port 443) traffic from any source.
+Logging and Monitoring: CloudWatch monitoring is configured to track application health and performance.
 
-Allows outbound internet traffic.
+Detailed Steps for Each YAML File
+Step 1: VPC and Networking Setup (vpc.yaml)
+This template defines:
 
-ALB Security Group:
+VPC: Creates a new Virtual Private Cloud (VPC) to isolate the network.
 
-Allows inbound HTTP/HTTPS traffic (ports 80/443) from the internet.
+Subnets: Public and private subnets for different resources.
 
-DB Security Group:
+Internet Gateway: An Internet Gateway for internet access from the public subnets.
 
-Allows inbound traffic from the Web Security Group (EC2 instances) to the RDS database.
+Route Tables: Defines routing tables for public and private subnets.
 
-Ensure that these security groups are applied correctly to each resource after deployment.
+Step 2: NAT Gateway Setup (nat-gateway.yaml)
+This template configures:
 
-Step 3: Configure Route 53 DNS Records
-Once your ALB is up and running, configure your domain in Route 53:
+Elastic IP Address: Allocates an Elastic IP for the NAT Gateway.
 
-Go to Route 53 in the AWS Console.
+NAT Gateway: Creates a NAT Gateway in the public subnet to allow internet access for resources in private subnets.
 
-Create an A Record (or CNAME) that points to the ALB's DNS name.
+Private Route Table: Defines routing for private subnets to route traffic to the NAT Gateway.
 
-Ensure the domain is correctly configured to route traffic to the ALB.
+Step 3: RDS Instance from Snapshot (rds-snapshot.yaml)
+This template creates:
 
-Step 4: Test the Website
-After DNS propagation, navigate to your domain. You should see the dynamic website hosted and accessible.
+RDS Instance: Restores a database instance from a snapshot, ensuring that the dynamic website has the necessary database state to operate.
 
-Clean Up
-To avoid unnecessary charges, delete the CloudFormation stack after testing:
+Step 4: ALB Setup (alb.yaml)
+This template configures:
 
-In the AWS Management Console, navigate to CloudFormation.
+Application Load Balancer (ALB): Creates an ALB to distribute incoming web traffic across the EC2 instances.
 
-Select the stack that was created.
+Listener: Sets up a listener to handle incoming HTTP/HTTPS requests.
 
-Click Delete to remove all resources associated with the stack.
+Target Group: Defines a target group of EC2 instances that the ALB will route traffic to.
 
-This will clean up all resources, including VPC, EC2 instances, RDS, ALB, and Route 53 configurations.
+Step 5: Auto Scaling Group (ASG) Setup (asg.yaml)
+This template sets up:
 
-Conclusion
-This project demonstrates a scalable and secure infrastructure for hosting a dynamic website on AWS using CloudFormation. It integrates multiple AWS services like EC2, RDS, ALB, Route 53, and more, while ensuring security through properly configured security groups.
+Auto Scaling Group (ASG): Automatically scales the number of EC2 instances based on traffic demand.
 
+Launch Configuration: Specifies the instance type and AMI for the EC2 instances.
+
+Scaling Policies: Defines conditions for scaling in and out of instances based on CloudWatch metrics.
+
+Step 6: Route 53 DNS Configuration (route-53.yaml)
+This template configures:
+
+Route 53 Hosted Zone: Creates a hosted zone for managing DNS records for your domain.
+
+DNS Record: Sets up an alias record to point your domain to the ALB's DNS name, allowing users to access your website using the custom domain.
+
+Cleanup
+To delete the resources created by CloudFormation, go to the CloudFormation Console, select each stack, and choose Delete Stack. This will remove all resources and prevent ongoing charges.
+
+Troubleshooting
+Stack creation fails: Check the AWS CloudFormation events and logs to identify issues with resource creation. Issues are often related to IAM permissions or incorrect parameters in the template.
+
+Access issues: Ensure that your security groups and network ACLs are correctly configured to allow inbound traffic to the EC2 instances or Load Balancer.
+
+
+Acknowledgments
+AWS CloudFormation documentation and resources: https://aws.amazon.com/cloudformation/
+
+AWS EC2, RDS, ALB, and ASG service documentation.
 
